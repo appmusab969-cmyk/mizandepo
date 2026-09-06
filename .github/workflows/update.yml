@@ -1,0 +1,43 @@
+name: stocks.json guncelle
+
+# halalterminal.com free plani ayda ~50 istek verir. symbols.txt ~45 sembol
+# icerdiginden ayda BIR kez tam tarama yapiyoruz. Plani yukseltirsen cron'u
+# haftaliga (or. '0 6 * * 1') cevirmen yeterli.
+on:
+  schedule:
+    - cron: '0 6 1 * *' # her ayin 1'i, 06:00 UTC
+  workflow_dispatch: {} # elle tetikleme (Actions sekmesinden "Run workflow")
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-stocks
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Veriyi cek ve stocks.json uret
+        env:
+          HALALTERMINAL_API_KEY: ${{ secrets.HALALTERMINAL_API_KEY }}
+        run: node scripts/fetch.mjs
+
+      - name: Degisiklik varsa commit'le
+        run: |
+          if git diff --quiet -- stocks.json; then
+            echo "stocks.json degismedi; commit atlanacak."
+            exit 0
+          fi
+          git config user.name  "mizan-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add stocks.json
+          git commit -m "chore: stocks.json haftalik/aylik guncelleme"
+          git push

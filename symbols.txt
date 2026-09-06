@@ -1,0 +1,59 @@
+# Mizan - taranacak semboller (halalterminal.com)
+#
+# Her satir bir sembol. '#' ile baslayan satirlar ve bos satirlar yok sayilir.
+# Bu listedeki her sembol icin haftalik/aylik is akisi /api/screen/{symbol}
+# cagirir (1 sembol = ~3-5 token). Free planda ayda ~50 istek siniri oldugu
+# icin listeyi ~45 sembolde tut; plani yukseltince genisletebilirsin.
+#
+# assetType, price, changePercent gibi alanlar API'den GELMEZ; script bunlari
+# stocks.json'daki mevcut degerden korur (yoksa 0 / "Hisse" yazar).
+
+# --- Buyuk ABD helal hisseleri ---
+AAPL
+MSFT
+NVDA
+AVGO
+GOOGL
+AMZN
+META
+TSLA
+LLY
+XOM
+PG
+KO
+JPM
+UNH
+V
+MA
+HD
+COST
+PEP
+ADBE
+CRM
+ORCL
+AMD
+QCOM
+TXN
+INTC
+CSCO
+PFE
+MRK
+ABBV
+TMO
+NKE
+MCD
+CAT
+CVX
+WMT
+DIS
+ACN
+LIN
+HON
+
+# --- Bilinen helal / Seriat ETF'leri ---
+SPUS
+SPSK
+SPRE
+HLAL
+UMMA
+WSHR
