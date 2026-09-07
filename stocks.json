@@ -4,10 +4,10 @@
   "standard": "AAOIFI Şeriat Standardı No. 21 (borç/piyasa değeri < %30, faiz geliri < %5)",
   "note": "Otomatik üretildi (scripts/build.mjs). Üçüncü bir tarama servisi kullanılmaz; ham SEC verisi Mizan algoritmasıyla işlenir. ETF'ler bağımsız Şeriat kurulu onayına göre beyaz listeden gelir. Fiyatlar Yahoo chart endpoint'inden, günde bir güncellenir.",
   "counts": {
-    "ok": 516,
+    "ok": 515,
     "failed": 0,
-    "total": 516,
-    "halal": 288,
+    "total": 515,
+    "halal": 287,
     "doubtful": 62,
     "nonHalal": 166
   },
@@ -7444,7 +7444,7 @@
       "price": 319.97,
       "changePercent": -2.51,
       "marketCapBillions": 4674,
-      "dividendYield": 0.33,
+      "dividendYield": 0,
       "debtRatio": 1.8,
       "status": "halal",
       "mizanScore": 96,
@@ -13475,8 +13475,8 @@
       "assetType": "ETF",
       "price": 59.03,
       "changePercent": -0.22,
-      "marketCapBillions": 0,
-      "dividendYield": 0,
+      "marketCapBillions": 2.11,
+      "dividendYield": 0.52,
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 92,
@@ -13485,6 +13485,69 @@
         "standard": "Şeriat kurulu onayı (beyaz liste)",
         "source": "etf-whitelist.json",
         "board": "S&P Dow Jones Shariah Supervisory Board (AAOIFI metodolojisi)"
+      },
+      "fund": {
+        "expenseRatioPct": 0.45,
+        "inceptionDate": "2019-12-17",
+        "aumUsd": 2105744638.63,
+        "netAssetsUsd": 2090379857.89,
+        "asOf": "2026-02-28",
+        "trust": "Tidal Trust I",
+        "totalPositions": 212,
+        "topHoldings": [
+          {
+            "symbol": "NVDA",
+            "name": "NVIDIA Corp",
+            "weightPct": 13.28
+          },
+          {
+            "symbol": "AAPL",
+            "name": "Apple Inc",
+            "weightPct": 12.04
+          },
+          {
+            "symbol": "MSFT",
+            "name": "Microsoft Corp",
+            "weightPct": 9
+          },
+          {
+            "symbol": "GOOGL",
+            "name": "Alphabet Inc",
+            "weightPct": 5.59
+          },
+          {
+            "symbol": "AVGO",
+            "name": "Broadcom Inc",
+            "weightPct": 4.65
+          },
+          {
+            "symbol": "TSLA",
+            "name": "Tesla Inc",
+            "weightPct": 3.49
+          },
+          {
+            "symbol": "LLY",
+            "name": "Eli Lilly & Co",
+            "weightPct": 2.58
+          },
+          {
+            "symbol": "XOM",
+            "name": "Exxon Mobil Corp",
+            "weightPct": 1.98
+          },
+          {
+            "symbol": "JNJ",
+            "name": "Johnson & Johnson",
+            "weightPct": 1.84
+          },
+          {
+            "symbol": "MU",
+            "name": "Micron Technology Inc",
+            "weightPct": 1.43
+          }
+        ],
+        "filingUrl": "https://www.sec.gov/Archives/edgar/data/0001742912/000200032426001717/",
+        "source": "SEC EDGAR Form N-PORT"
       }
     },
     {
@@ -15292,8 +15355,8 @@
       "assetType": "ETF",
       "price": 73.26,
       "changePercent": -0.21,
-      "marketCapBillions": 0,
-      "dividendYield": 0,
+      "marketCapBillions": 0.92,
+      "dividendYield": 0.44,
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 89,
@@ -15302,6 +15365,69 @@
         "standard": "Şeriat kurulu onayı (beyaz liste)",
         "source": "etf-whitelist.json",
         "board": "Wahed Şeriat Danışma Kurulu (Yasaar) — FTSE Shariah endeksi"
+      },
+      "fund": {
+        "expenseRatioPct": 0.5,
+        "inceptionDate": "2019-07-15",
+        "aumUsd": 918039667.82,
+        "netAssetsUsd": 917669956.87,
+        "asOf": "2026-05-31",
+        "trust": "Listed Funds Trust",
+        "totalPositions": 208,
+        "topHoldings": [
+          {
+            "symbol": "AAPL",
+            "name": "Apple Inc",
+            "weightPct": 13.22
+          },
+          {
+            "symbol": "MSFT",
+            "name": "Microsoft Corp",
+            "weightPct": 9.51
+          },
+          {
+            "symbol": "GOOGL",
+            "name": "Alphabet Inc",
+            "weightPct": 6.31
+          },
+          {
+            "symbol": "AVGO",
+            "name": "Broadcom Inc",
+            "weightPct": 5.83
+          },
+          {
+            "symbol": "GOOG",
+            "name": "Alphabet Inc",
+            "weightPct": 5.09
+          },
+          {
+            "symbol": "META",
+            "name": "Meta Platforms Inc",
+            "weightPct": 3.97
+          },
+          {
+            "symbol": "TSLA",
+            "name": "Tesla Inc",
+            "weightPct": 3.58
+          },
+          {
+            "symbol": "MU",
+            "name": "Micron Technology Inc",
+            "weightPct": 3.24
+          },
+          {
+            "symbol": "LLY",
+            "name": "Eli Lilly & Co",
+            "weightPct": 2.43
+          },
+          {
+            "symbol": "AMD",
+            "name": "Advanced Micro Devices Inc",
+            "weightPct": 2.34
+          }
+        ],
+        "filingUrl": "https://www.sec.gov/Archives/edgar/data/0001683471/000119312526325595/",
+        "source": "SEC EDGAR Form N-PORT"
       }
     },
     {
@@ -15833,8 +15959,8 @@
       "assetType": "ETF",
       "price": 17.85,
       "changePercent": 0.06,
-      "marketCapBillions": 0,
-      "dividendYield": 0,
+      "marketCapBillions": 0.53,
+      "dividendYield": 4.6,
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 88,
@@ -15843,6 +15969,69 @@
         "standard": "Şeriat kurulu onayı (beyaz liste)",
         "source": "etf-whitelist.json",
         "board": "S&P Shariah Supervisory Board — faizsiz sukuk sepeti"
+      },
+      "fund": {
+        "expenseRatioPct": 0.55,
+        "inceptionDate": "2019-12-27",
+        "aumUsd": 533011694.4,
+        "netAssetsUsd": 530824412.05,
+        "asOf": "2026-05-31",
+        "trust": "Tidal Trust I",
+        "totalPositions": 170,
+        "topHoldings": [
+          {
+            "symbol": "",
+            "name": "KSA Ijarah Sukuk Ltd",
+            "weightPct": 1.77
+          },
+          {
+            "symbol": "",
+            "name": "KSA Sukuk Ltd",
+            "weightPct": 1.68
+          },
+          {
+            "symbol": "",
+            "name": "KSA Sukuk Ltd",
+            "weightPct": 1.65
+          },
+          {
+            "symbol": "",
+            "name": "Global Sukuk Ventures",
+            "weightPct": 1.63
+          },
+          {
+            "symbol": "",
+            "name": "SA Global Sukuk Ltd",
+            "weightPct": 1.49
+          },
+          {
+            "symbol": "",
+            "name": "KSA Sukuk Ltd",
+            "weightPct": 1.41
+          },
+          {
+            "symbol": "",
+            "name": "KSA Sukuk Ltd",
+            "weightPct": 1.32
+          },
+          {
+            "symbol": "",
+            "name": "Suci Second Investment Co",
+            "weightPct": 1.28
+          },
+          {
+            "symbol": "",
+            "name": "KSA Sukuk Ltd",
+            "weightPct": 1.27
+          },
+          {
+            "symbol": "",
+            "name": "KSA Ijarah Sukuk Ltd",
+            "weightPct": 1.23
+          }
+        ],
+        "filingUrl": "https://www.sec.gov/Archives/edgar/data/0001742912/000200032426003239/",
+        "source": "SEC EDGAR Form N-PORT"
       }
     },
     {
@@ -16026,8 +16215,8 @@
       "assetType": "ETF",
       "price": 48.1,
       "changePercent": 1.02,
-      "marketCapBillions": 0,
-      "dividendYield": 0,
+      "marketCapBillions": 0.1,
+      "dividendYield": 0.71,
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 85,
@@ -16036,6 +16225,69 @@
         "standard": "Şeriat kurulu onayı (beyaz liste)",
         "source": "etf-whitelist.json",
         "board": "S&P Dow Jones Shariah Supervisory Board"
+      },
+      "fund": {
+        "expenseRatioPct": 0.55,
+        "inceptionDate": "2023-11-30",
+        "aumUsd": 95520853.2,
+        "netAssetsUsd": 95477544.5,
+        "asOf": "2026-01-31",
+        "trust": "SP Funds Trust",
+        "totalPositions": 96,
+        "topHoldings": [
+          {
+            "symbol": "TSM",
+            "name": "TSMC",
+            "weightPct": 10.76
+          },
+          {
+            "symbol": "NVDA",
+            "name": "NVIDIA Corp",
+            "weightPct": 10.75
+          },
+          {
+            "symbol": "AAPL",
+            "name": "Apple Inc",
+            "weightPct": 10.57
+          },
+          {
+            "symbol": "MSFT",
+            "name": "Microsoft Corp",
+            "weightPct": 9.44
+          },
+          {
+            "symbol": "ASML",
+            "name": "ASML Holding NV",
+            "weightPct": 7.23
+          },
+          {
+            "symbol": "AVGO",
+            "name": "Broadcom Inc",
+            "weightPct": 4.62
+          },
+          {
+            "symbol": "",
+            "name": "MediaTek Inc",
+            "weightPct": 4.54
+          },
+          {
+            "symbol": "",
+            "name": "Delta Electronics Inc",
+            "weightPct": 3.77
+          },
+          {
+            "symbol": "SAP",
+            "name": "SAP SE",
+            "weightPct": 2.91
+          },
+          {
+            "symbol": "TOELY",
+            "name": "Tokyo Electron Ltd",
+            "weightPct": 1.85
+          }
+        ],
+        "filingUrl": "https://www.sec.gov/Archives/edgar/data/0001989916/000089418926008437/",
+        "source": "SEC EDGAR Form N-PORT"
       }
     },
     {
@@ -16045,8 +16297,8 @@
       "assetType": "ETF",
       "price": 33.78,
       "changePercent": 1.26,
-      "marketCapBillions": 0,
-      "dividendYield": 0,
+      "marketCapBillions": 0.11,
+      "dividendYield": 1.06,
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 85,
@@ -16055,25 +16307,69 @@
         "standard": "Şeriat kurulu onayı (beyaz liste)",
         "source": "etf-whitelist.json",
         "board": "S&P Dow Jones Shariah Supervisory Board"
-      }
-    },
-    {
-      "symbol": "SPDW",
-      "name": "SP Funds Dividend Sharia ETF",
-      "sector": "Endeks",
-      "assetType": "ETF",
-      "price": 52.31,
-      "changePercent": 0.4,
-      "marketCapBillions": 0,
-      "dividendYield": 0,
-      "debtRatio": 0,
-      "status": "halal",
-      "mizanScore": 84,
-      "whyNote": "S&P Dow Jones Shariah Supervisory Board tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır.",
-      "screening": {
-        "standard": "Şeriat kurulu onayı (beyaz liste)",
-        "source": "etf-whitelist.json",
-        "board": "S&P Dow Jones Shariah Supervisory Board"
+      },
+      "fund": {
+        "expenseRatioPct": 0.55,
+        "inceptionDate": "2023-12-19",
+        "aumUsd": 111208038.61,
+        "netAssetsUsd": 111134513.21,
+        "asOf": "2026-01-31",
+        "trust": "SP Funds Trust",
+        "totalPositions": 381,
+        "topHoldings": [
+          {
+            "symbol": "TSM",
+            "name": "TSMC",
+            "weightPct": 16.3
+          },
+          {
+            "symbol": "BABA",
+            "name": "Alibaba Group Holding Ltd",
+            "weightPct": 5.05
+          },
+          {
+            "symbol": "ASML",
+            "name": "ASML Holding NV",
+            "weightPct": 3.08
+          },
+          {
+            "symbol": "",
+            "name": "Samsung Electronics Co Ltd",
+            "weightPct": 3.05
+          },
+          {
+            "symbol": "",
+            "name": "SK hynix Inc",
+            "weightPct": 1.9
+          },
+          {
+            "symbol": "RHHBY",
+            "name": "Roche Holding AG",
+            "weightPct": 1.77
+          },
+          {
+            "symbol": "",
+            "name": "AstraZeneca PLC",
+            "weightPct": 1.59
+          },
+          {
+            "symbol": "NVS",
+            "name": "Novartis AG",
+            "weightPct": 1.56
+          },
+          {
+            "symbol": "NSRGY",
+            "name": "Nestle SA",
+            "weightPct": 1.36
+          },
+          {
+            "symbol": "SAP",
+            "name": "SAP SE",
+            "weightPct": 1.14
+          }
+        ],
+        "filingUrl": "https://www.sec.gov/Archives/edgar/data/0001989916/000089418926008438/",
+        "source": "SEC EDGAR Form N-PORT"
       }
     },
     {
@@ -16083,8 +16379,8 @@
       "assetType": "ETF",
       "price": 37.64,
       "changePercent": 1.05,
-      "marketCapBillions": 0,
-      "dividendYield": 0,
+      "marketCapBillions": 0.28,
+      "dividendYield": 0.96,
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 83,
@@ -16093,6 +16389,69 @@
         "standard": "Şeriat kurulu onayı (beyaz liste)",
         "source": "etf-whitelist.json",
         "board": "Wahed Şeriat Danışma Kurulu — Dow Jones Islamic Market World endeksi"
+      },
+      "fund": {
+        "expenseRatioPct": 0.65,
+        "inceptionDate": "2022-01-06",
+        "aumUsd": 280672932.46,
+        "netAssetsUsd": 280473520.97,
+        "asOf": "2026-05-31",
+        "trust": "Listed Funds Trust",
+        "totalPositions": 95,
+        "topHoldings": [
+          {
+            "symbol": "TSM",
+            "name": "TSMC",
+            "weightPct": 10.04
+          },
+          {
+            "symbol": "",
+            "name": "Samsung Electronics Co Ltd",
+            "weightPct": 8.24
+          },
+          {
+            "symbol": "",
+            "name": "SK hynix Inc",
+            "weightPct": 8.14
+          },
+          {
+            "symbol": "ASML",
+            "name": "ASML Holding NV",
+            "weightPct": 5.32
+          },
+          {
+            "symbol": "IFX",
+            "name": "Infineon Technologies AG",
+            "weightPct": 4.19
+          },
+          {
+            "symbol": "",
+            "name": "Murata Manufacturing Co Ltd",
+            "weightPct": 3.04
+          },
+          {
+            "symbol": "AZN",
+            "name": "AstraZeneca PLC",
+            "weightPct": 2.56
+          },
+          {
+            "symbol": "NOVN",
+            "name": "Novartis AG",
+            "weightPct": 2.51
+          },
+          {
+            "symbol": "ROP",
+            "name": "Roche Holding AG",
+            "weightPct": 2.46
+          },
+          {
+            "symbol": "NESN",
+            "name": "Nestle SA",
+            "weightPct": 2.27
+          }
+        ],
+        "filingUrl": "https://www.sec.gov/Archives/edgar/data/0001683471/000119312526325594/",
+        "source": "SEC EDGAR Form N-PORT"
       }
     },
     {
@@ -16112,6 +16471,17 @@
         "standard": "Şeriat kurulu onayı (beyaz liste)",
         "source": "etf-whitelist.json",
         "board": "MSCI Islamic Index — bağımsız Şeriat kurulu"
+      },
+      "fund": {
+        "expenseRatioPct": 0.6,
+        "inceptionDate": "2007-12-10",
+        "aumUsd": null,
+        "asOf": null,
+        "trust": null,
+        "totalPositions": 0,
+        "topHoldings": [],
+        "filingUrl": null,
+        "source": null
       }
     },
     {
@@ -16121,8 +16491,8 @@
       "assetType": "ETF",
       "price": 0,
       "changePercent": 0,
-      "marketCapBillions": 0,
-      "dividendYield": 0,
+      "marketCapBillions": 0.06,
+      "dividendYield": 1.36,
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 82,
@@ -16131,6 +16501,17 @@
         "standard": "Şeriat kurulu onayı (beyaz liste)",
         "source": "etf-whitelist.json",
         "board": "MSCI Islamic Index — bağımsız Şeriat kurulu"
+      },
+      "fund": {
+        "expenseRatioPct": 0.5,
+        "inceptionDate": "2007-12-10",
+        "aumUsd": null,
+        "asOf": null,
+        "trust": null,
+        "totalPositions": 0,
+        "topHoldings": [],
+        "filingUrl": null,
+        "source": null
       }
     },
     {
@@ -16140,8 +16521,8 @@
       "assetType": "ETF",
       "price": 20.43,
       "changePercent": -0.49,
-      "marketCapBillions": 0,
-      "dividendYield": 0,
+      "marketCapBillions": 0.21,
+      "dividendYield": 3.84,
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 80,
@@ -16150,6 +16531,69 @@
         "standard": "Şeriat kurulu onayı (beyaz liste)",
         "source": "etf-whitelist.json",
         "board": "S&P Shariah Supervisory Board — taranmış GYO sepeti"
+      },
+      "fund": {
+        "expenseRatioPct": 0.69,
+        "inceptionDate": "2020-12-29",
+        "aumUsd": 210947998.67,
+        "netAssetsUsd": 208905272.91,
+        "asOf": "2026-02-28",
+        "trust": "Tidal Trust I",
+        "totalPositions": 28,
+        "topHoldings": [
+          {
+            "symbol": "EQIX",
+            "name": "Equinix Inc",
+            "weightPct": 13.78
+          },
+          {
+            "symbol": "PLD",
+            "name": "Prologis Inc",
+            "weightPct": 12.51
+          },
+          {
+            "symbol": "WELL",
+            "name": "Welltower Inc",
+            "weightPct": 12.23
+          },
+          {
+            "symbol": "GMG",
+            "name": "Goodman Group",
+            "weightPct": 11.57
+          },
+          {
+            "symbol": "SUI",
+            "name": "Sun Communities Inc",
+            "weightPct": 5.11
+          },
+          {
+            "symbol": "EGP",
+            "name": "EastGroup Properties Inc",
+            "weightPct": 4.99
+          },
+          {
+            "symbol": "ELS",
+            "name": "Equity LifeStyle Properties In",
+            "weightPct": 4.87
+          },
+          {
+            "symbol": "CPT",
+            "name": "Camden Property Trust",
+            "weightPct": 4.85
+          },
+          {
+            "symbol": "AVB",
+            "name": "AvalonBay Communities Inc",
+            "weightPct": 4.84
+          },
+          {
+            "symbol": "MAA",
+            "name": "Mid-America Apartment Communit",
+            "weightPct": 4.82
+          }
+        ],
+        "filingUrl": "https://www.sec.gov/Archives/edgar/data/0001742912/000200032426001711/",
+        "source": "SEC EDGAR Form N-PORT"
       }
     },
     {
@@ -16169,6 +16613,17 @@
         "standard": "Şeriat kurulu onayı (beyaz liste)",
         "source": "etf-whitelist.json",
         "board": "MSCI Islamic Index — bağımsız Şeriat kurulu"
+      },
+      "fund": {
+        "expenseRatioPct": 0.85,
+        "inceptionDate": "2007-12-10",
+        "aumUsd": null,
+        "asOf": null,
+        "trust": null,
+        "totalPositions": 0,
+        "topHoldings": [],
+        "filingUrl": null,
+        "source": null
       }
     },
     {
@@ -16188,6 +16643,17 @@
         "standard": "Şeriat kurulu onayı (beyaz liste)",
         "source": "etf-whitelist.json",
         "board": "Ratings Intelligence — taranmış küresel hisse endeksi"
+      },
+      "fund": {
+        "expenseRatioPct": 0.5,
+        "inceptionDate": "2021-05-13",
+        "aumUsd": null,
+        "asOf": null,
+        "trust": null,
+        "totalPositions": 0,
+        "topHoldings": [],
+        "filingUrl": null,
+        "source": null
       }
     },
     {

@@ -56,8 +56,27 @@ en fazla **şüpheli**.
 
 `etf-whitelist.json` içindeki, bağımsız **Şeriat kuruluna** sahip ETF'ler
 (SPUS, HLAL, UMMA, SPSK, SPRE, ...) doğrudan **helal**. Listede olmayan HER
-ETF **şüpheli** işaretlenir (kurul onayı bizce doğrulanamadı). Portföy bazlı
-holdings taraması ileride eklenebilir.
+ETF **şüpheli** işaretlenir (kurul onayı bizce doğrulanamadı).
+
+Her ETF için **künye + en büyük ~10 pozisyon** çekilir:
+
+- **Portföy, fon büyüklüğü (AUM), pozisyon sayısı ve değerleme tarihi** →
+  **SEC EDGAR Form N-PORT** (`NPORT-P`). ABD'de kayıtlı her fon çeyrekte bir bu
+  beyannameyi verir; her pozisyonun adı, CUSIP/ticker'ı, USD değeri ve portföy
+  yüzdesi içindedir. Resmi ve ücretsiz kaynak — hiçbir finans sitesi kazınmaz.
+  `lib/edgar.mjs` → `fetchNportHoldings()`: EDGAR tam metin araması ile en yeni
+  `NPORT-P`'yi bulur, `primary_doc.xml`'i ayrıştırır, seri adını fon adıyla
+  doğrular (ticker/isim çakışmasına karşı) ve sonucu 30 gün cache'ler.
+- **Gider oranı ve kuruluş tarihi** N-PORT'ta yer almaz (izahnamede); bunlar
+  `etf-whitelist.json`'da `expenseRatioPct` / `inception` alanlarına elle
+  işlenir.
+- **UCITS / ABD dışı kayıtlı fonlar** (ISDW, ISUS, ISDE, WSHR, ...) N-PORT
+  vermez → yalnızca beyaz liste + elle künye alanlarıyla gösterilir, portföy
+  listesi boş kalır.
+
+Uygulama tarafında portföydeki bir sembol, uygulamanın kendi listesinde de
+varsa dokunulabilir ve o hissenin Şeriat taramasına gider
+(`lib/screens/AssetDetail.dart`).
 
 ## Limit / cache
 

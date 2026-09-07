@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 import { cachedFetch } from '../lib/http.mjs';
-import { loadTickerMap, loadFinancials, fetchQuote } from '../lib/edgar.mjs';
+import { loadTickerMap, loadFinancials, fetchQuote, fetchNportHoldings } from '../lib/edgar.mjs';
 import { businessScreen, financialRatios, screenEquity } from '../lib/screen.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -182,6 +182,46 @@ async function processEtf(symbol, meta, prev) {
     price: Number(old.price ?? 0),
     changePercent: Number(old.changePercent ?? 0),
   };
+
+  // Portföy + fon toplamları: SEC EDGAR Form N-PORT (resmi, çeyreklik). ABD'de
+  // kayıtlı olmayan (UCITS vb.) fonlar için null döner → eski künyeyi koru.
+  const nport = await fetchNportHoldings(CACHE_ROOT, symbol, meta.name);
+  const prevFund = old.fund ?? {};
+
+  // Gider oranı ve kuruluş tarihi N-PORT'ta yoktur (izahnamede); beyaz listeye
+  // elle işlenir. Diğer alanlar N-PORT'tan, yoksa önceki değerden gelir.
+  const fund = {
+    ...(meta.expenseRatioPct != null
+      ? { expenseRatioPct: meta.expenseRatioPct }
+      : prevFund.expenseRatioPct != null
+        ? { expenseRatioPct: prevFund.expenseRatioPct }
+        : {}),
+    ...(meta.inception ? { inceptionDate: meta.inception } : prevFund.inceptionDate ? { inceptionDate: prevFund.inceptionDate } : {}),
+    ...(nport
+      ? {
+          aumUsd: nport.aumUsd,
+          netAssetsUsd: nport.netAssetsUsd,
+          asOf: nport.asOf,
+          trust: nport.trust,
+          totalPositions: nport.totalPositions,
+          topHoldings: nport.topHoldings,
+          filingUrl: nport.filingUrl,
+          source: nport.source,
+        }
+      : {
+          aumUsd: prevFund.aumUsd ?? null,
+          asOf: prevFund.asOf ?? null,
+          trust: prevFund.trust ?? null,
+          totalPositions: prevFund.totalPositions ?? 0,
+          topHoldings: prevFund.topHoldings ?? [],
+          filingUrl: prevFund.filingUrl ?? null,
+          source: prevFund.source ?? null,
+        }),
+  };
+
+  const hasFund = Object.keys(fund).length > 0 &&
+    (fund.topHoldings?.length || fund.aumUsd != null || fund.expenseRatioPct != null || fund.inceptionDate != null);
+
   return {
     symbol,
     name: meta.name,
@@ -189,7 +229,9 @@ async function processEtf(symbol, meta, prev) {
     assetType: 'ETF',
     price: Number((quote.price || 0).toFixed(2)),
     changePercent: Number((quote.changePercent || 0).toFixed(2)),
-    marketCapBillions: Number(old.marketCapBillions ?? 0),
+    marketCapBillions: fund.aumUsd
+      ? Number((fund.aumUsd / 1e9).toFixed(2))
+      : Number(old.marketCapBillions ?? 0),
     dividendYield: Number(old.dividendYield ?? 0),
     debtRatio: 0,
     status: 'halal',
@@ -200,6 +242,7 @@ async function processEtf(symbol, meta, prev) {
       source: 'etf-whitelist.json',
       board: meta.board,
     },
+    ...(hasFund ? { fund } : {}),
   };
 }
 
