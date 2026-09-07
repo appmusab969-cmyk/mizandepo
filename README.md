@@ -5,64 +5,106 @@ Mizan uygulamasının gösterdiği **ABD borsası helal hisse / fon / ETF** list
 ## Nasıl çalışır
 
 ```
-halalterminal.com API
-        │  (ayda 1 kez, GitHub Actions — .github/workflows/update.yml)
+SEC EDGAR (data.sec.gov)  ── ham XBRL: borç, nakit, alacak, gelir, faiz geliri
+   + SIC sektör kodu           + Yahoo chart endpoint: fiyat / değişim %
+        │
+        │  (haftalık, GitHub Actions — .github/workflows/update.yml)
+        │  Mizan'ın KENDİ AAOIFI algoritması (lib/screen.mjs) işler
         ▼
-   stocks.json   ◄── tek gerçek kaynak (bu repoda)
+   stocks.json   ◄── uygulamanın okuduğu tek kaynak (bu repoda)
         │  (günde 1 kez, cihaz başına — uygulamadaki StockRepository)
         ▼
    Mizan uygulaması  ── cihazda SharedPreferences cache + gömülü asset yedeği
 ```
 
+- **Üçüncü bir tarama servisi KULLANILMAZ.** Ham SEC verisi çekilip
+  `scripts/build.mjs` içindeki algoritmayla helal / şüpheli / uygun değil
+  kararına dönüştürülür. Önceki `halalterminal.com` bağımlılığı kaldırıldı.
 - **Uygulama API'yi hiç görmez.** Sadece bu repodaki `stocks.json`'u okur:
   `https://raw.githubusercontent.com/appmusab969-cmyk/mizandepo/main/stocks.json`
-- **API limiti:** halalterminal free planı ayda ~50 istek / ~500 token verir.
-  `symbols.txt` ~45 sembol içerdiğinden workflow **ayda bir** çalışır. Planı
-  yükseltirsen `update.yml` içindeki cron'u haftalığa çevir (`0 6 * * 1`).
+
+## Standart — AAOIFI Şeriat Standardı No. 21
+
+Dünyada en yaygın kabul gören ölçüt (Wahed, SP Funds / S&P Dow Jones Islamic
+Market, DJIM bunu kullanır).
+
+**1) Faaliyet (sektör) taraması** — SIC koduyla. Esas faaliyeti şu alanlarda
+olan şirket doğrudan **uygun değil**: faizli bankacılık / aracı kurum / faizli
+finans, sigorta, alkol, domuz, kumar, tütün, yetişkin içerik, konvansiyonel
+savaş sanayii. "İçecek üst kategorisi" (SIC 2080, Coca-Cola vb.) gibi belirsiz
+kodlar **şüpheli** işaretlenir (kullanıcı gelir kırılımını doğrulasın).
+
+**2) Finansal oranlar** (payda = piyasa değeri; hesaplanamıyorsa toplam varlık):
+
+| Oran | AAOIFI eşiği |
+|---|---|
+| Faizli borç / payda | < %30 |
+| (Nakit + faizli menkul kıymet) / payda | < %30 |
+| Alacaklar / payda | < %49 |
+| Helal olmayan (faiz) gelir / toplam gelir | < %5 |
+
+**3) Karar:** Sektör uygun değil → **uygun değil**. Tüm oranlar altında + sektör
+uygun → **helal**. Bir oran eşiği az aşıyor (≤ +5 puan) ya da veri eksik →
+**şüpheli**. Bir oran belirgin aşıyor (ve payda = piyasa değeri) → **uygun
+değil**. Payda toplam varlıksa aşan oran tek başına "uygun değil" DEDİRTMEZ,
+en fazla **şüpheli**.
+
+> **Dini uygulama ilkesi:** Emin olmadığımız hiçbir şeye "helal" demeyiz.
+> Veri eksik, oran sınırda ya da kaynak bayatsa sonuç **şüpheli**dir.
+
+## ETF'ler
+
+`etf-whitelist.json` içindeki, bağımsız **Şeriat kuruluna** sahip ETF'ler
+(SPUS, HLAL, UMMA, SPSK, SPRE, ...) doğrudan **helal**. Listede olmayan HER
+ETF **şüpheli** işaretlenir (kurul onayı bizce doğrulanamadı). Portföy bazlı
+holdings taraması ileride eklenebilir.
+
+## Limit / cache
+
+SEC "fair access" siniri **saniyede 10 istek** + gerçek `User-Agent` zorunlu.
+Script `~1 istek/sn` gider (`lib/http.mjs` içinde `MIN_GAP_MS`). İki katmanlı
+cache limite takılmayı önler:
+
+| Klasör | İçerik | Boyut | Git'te? |
+|---|---|---|---|
+| `cache/` | Ham SEC companyfacts + submissions yanıtları | ~2 GB | **Hayır** (`.gitignore`) — sadece yerel hız |
+| `cache-slim/` | Çıkarılmış özet: SIC + `extractFinancials()` çıktısı | ~0.7 MB | **Evet** — workflow commit'ler |
+
+- **Slim cache** her CIK için ~0.5 KB tutar. 20 günden yeni bir slim kaydı
+  varsa o şirket için EDGAR'a **hiç gidilmez**. GitHub Actions bu klasörü
+  commit'lediği için haftalık çalışma çoğunlukla buradan okur.
+- Fiyat/quote (Yahoo) cache'i 1 gün, ticker listesi 1 gün, S&P 500 bileşen
+  listesi 7 gün.
+- Tam çalışma (~500 hisse + 13 ETF): slim cache boşken ~20-25 dk (ilk hafta);
+  slim cache doluyken ~5-10 dk (çoğu süre Yahoo fiyat çekmede).
 
 ## Dosyalar
 
 | Dosya | Ne işe yarar |
 |---|---|
 | `stocks.json` | Uygulamanın okuduğu liste. Elle de düzenlenebilir. |
-| `symbols.txt` | Taranacak semboller (satır başına bir tane, `#` yorum). |
-| `scripts/fetch.mjs` | API'den çekip `stocks.json` üreten Node script'i. |
-| `.github/workflows/update.yml` | Aylık cron + elle tetikleme. |
+| `etf-whitelist.json` | Şeriat kurulu onaylı ETF'ler (helal kabul edilenler). |
+| `scripts/build.mjs` | SEC'den çekip `stocks.json` üreten ana script. |
+| `lib/http.mjs` | Hız sınırlayıcı + diske dayalı cache. |
+| `lib/edgar.mjs` | SEC EDGAR + Yahoo erişimi, XBRL kalemi çıkarma, slim cache. |
+| `lib/screen.mjs` | AAOIFI tarama algoritması (karar + Mizan skoru). |
+| `cache-slim/` | Çıkarılmış özet cache (repoya commit'lenir). |
+| `.github/workflows/update.yml` | Haftalık cron + elle tetikleme. |
 
-## Kurulum (bir kez)
+## Çalıştırma
 
-1. Bu klasörün içeriğini `appmusab969-cmyk/mizandepo` reposuna yükle (`main`).
-2. Repo → **Settings → Secrets and variables → Actions → New repository secret**
-   - Ad: `HALALTERMINAL_API_KEY`
-   - Değer: halalterminal API anahtarın
-3. **Actions** sekmesi → "stocks.json guncelle" → **Run workflow** ile ilk
-   çekimi elle başlat (ya da ay başı cron'u bekle).
+```bash
+node scripts/build.mjs                 # tam liste (S&P 500 + ETF)
+node scripts/build.mjs AAPL MSFT JPM   # sadece bu semboller (hızlı test)
+LIMIT=25 node scripts/build.mjs        # ilk 25 sembol
+```
 
-## Elle güncelleme
+Anahtar gerektirmez. `git add stocks.json cache/ && git commit` ile
+yayınlanır; uygulama en geç 20 saat içinde çeker.
 
-`stocks.json`'u düzenle, `main`'e commit'le. Kullanıcılar bir sonraki günlük
-yenilemede (veya uygulamada aşağı çekince) alır.
+## Kapsamı genişletmek
 
-## Şema
-
-Kök: `{ "updatedAt": "...", "stocks": [ ... ] }`. Her kayıt:
-
-| Alan | Tip | Kaynak | Not |
-|---|---|---|---|
-| `symbol` | string | symbols.txt | Zorunlu |
-| `name` | string | API | |
-| `sector` | string | API (TR'ye çevrilir) | ETF'lerde "Endeks" |
-| `assetType` | string | API (`asset_type`) | `Hisse` / `ETF` |
-| `price` | number | **elle / eski değer** | API vermiyor; `0` = veri yok → uygulama `—` gösterir |
-| `changePercent` | number | **elle / eski değer** | aynı |
-| `marketCapBillions` | number | API (`market_cap` / 1e9) | |
-| `dividendYield` | number | API (`dividend_yield`, zaten %) | |
-| `debtRatio` | number | API (`debt_to_market_cap_ratio` × 100) | AAOIFI eşiği ~%33 |
-| `status` | string | API | `halal` / `doubtful` / `nonHalal` — **tanınmayan değer asla helal sayılmaz** |
-| `mizanScore` | integer | script (oranlardan türetilir) | 0–100 |
-| `whyNote` | string | API (`business_screen_reason` / scholar) | |
-
-Hisseler `/api/screen/{symbol}`, ETF'ler ayrıca `/api/etf/{symbol}/screening`
-(scholar onayı / holdings ağırlığı) ile değerlendirilir. Tek sembol hatası o
-sembolü atlar; hiç sembol çekilemezse script çıkış kodu 1 verir ve workflow
-`stocks.json`'a dokunmaz.
+`scripts/build.mjs` içindeki `loadUniverse()` şu an S&P 500 bileşen CSV'sini
+kullanır. Russell 1000'e ya da tüm EDGAR şirketlerine çıkmak için orayı
+değiştir ve `update.yml` cron'unu / `timeout-minutes` değerini ayarla. Cache
+sayesinde ek yük ilk çalışmada bir defalıktır.

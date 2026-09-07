@@ -1,12 +1,21 @@
-name: stocks.json guncelle
+name: stocks.json guncelle (SEC EDGAR)
 
-# halalterminal.com free plani ayda ~50 istek verir. symbols.txt ~45 sembol
-# icerdiginden ayda BIR kez tam tarama yapiyoruz. Plani yukseltirsen cron'u
-# haftaliga (or. '0 6 * * 1') cevirmen yeterli.
+# Veri kaynagi SEC EDGAR (ucretsiz, anahtarsiz). Fair-access siniri saniyede
+# 10 istek; script ~1 istek/sn gider.
+#
+# İki katmanli cache:
+#   - cache/       : ham SEC companyfacts yanitlari (~2GB). .gitignore'da,
+#                    sadece yerel hiz icin. Actions'ta her calismada bostur.
+#   - cache-slim/  : cikarilmis ozet (~0.7MB, repoya commit'lenir). 20 gunden
+#                    yeni kayitlar icin EDGAR'a HIC gidilmez.
+#
+# Yani ilk hafta ~500 sirket icin tam EDGAR taramasi (~20-25 dk) yapilir ve
+# cache-slim/ commit'lenir; sonraki haftalar cogunlukla slim'den okur, sadece
+# fiyat (Yahoo) ve bayat kayitlar yenilenir (~5-10 dk).
 on:
   schedule:
-    - cron: '0 6 1 * *' # her ayin 1'i, 06:00 UTC
-  workflow_dispatch: {} # elle tetikleme (Actions sekmesinden "Run workflow")
+    - cron: '0 6 * * 1' # her pazartesi 06:00 UTC
+  workflow_dispatch: {} # elle tetikleme
 
 permissions:
   contents: write
@@ -18,6 +27,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
 
@@ -26,18 +36,16 @@ jobs:
           node-version: 20
 
       - name: Veriyi cek ve stocks.json uret
-        env:
-          HALALTERMINAL_API_KEY: ${{ secrets.HALALTERMINAL_API_KEY }}
-        run: node scripts/fetch.mjs
+        run: node scripts/build.mjs
 
       - name: Degisiklik varsa commit'le
         run: |
-          if git diff --quiet -- stocks.json; then
-            echo "stocks.json degismedi; commit atlanacak."
+          git add stocks.json cache-slim/
+          if git diff --cached --quiet; then
+            echo "Degisiklik yok; commit atlanacak."
             exit 0
           fi
           git config user.name  "mizan-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add stocks.json
-          git commit -m "chore: stocks.json haftalik/aylik guncelleme"
+          git commit -m "chore: stocks.json haftalik guncelleme (SEC EDGAR + AAOIFI)"
           git push

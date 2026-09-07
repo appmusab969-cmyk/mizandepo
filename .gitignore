@@ -1,0 +1,7 @@
+node_modules/
+*.log
+.DS_Store
+
+# Ham SEC companyfacts yanıtları çok büyük (~2GB). Repoya bunları DEĞİL,
+# scripts/build.mjs'in ürettiği slim özET cache'i (cache-slim/) commit'liyoruz.
+cache/
