@@ -1,100 +1,51 @@
 // Mizan veri üretici — SEC EDGAR + kendi AAOIFI algoritmamız
 // =========================================================
-// Bu script `stocks.json`'u üretir. Üçüncü bir tarama servisi KULLANMAZ:
+// Bu script `stocks.json` (+ `stocks.min.json` / `.gz`) üretir. Üçüncü bir
+// tarama servisi KULLANMAZ:
 //
-//   1. Evren: S&P 500 bileşenleri (Wikipedia/datasets CSV) + Şeriat ETF beyaz
-//      listesi (`etf-whitelist.json`).
+//   1. Evren: ~1500 en büyük ABD hissesi (lib/universe.mjs — S&P 500 çekirdek +
+//      SEC company_tickers piyasa değeri sıralaması) + ABD-listeli Şeriat ETF
+//      beyaz listesi (`etf-whitelist.json`).
 //   2. Her hisse için SEC EDGAR'dan ham XBRL çekilir (companyfacts) + SIC kodu
 //      (submissions). Fiyat Yahoo chart endpoint'inden (anahtarsız).
 //   3. `lib/screen.mjs` içindeki AAOIFI algoritması helal / şüpheli / uygun
 //      değil kararını verir ve 0-100 Mizan skoru üretir.
-//   4. Her yanıt `cache/` altına yazılır (repoya commit'lenir). Tekrar
-//      çalıştırınca 20 günden yeni cache varsa EDGAR'a HİÇ gidilmez → limit
-//      sorunu olmaz.
+//   4. Her ETF, kurul onayına ek olarak `lib/fund-health.mjs` ile otomatik
+//      portföy denetiminden geçer (N-PORT holdings vs. hisse taraması).
+//   5. Her yanıt `cache/` altına yazılır. 20 günden yeni cache varsa EDGAR'a
+//      HİÇ gidilmez → limit sorunu olmaz.
 //
 // Çalıştırma:
-//   node scripts/build.mjs                 # tam liste
+//   node scripts/build.mjs                 # tam liste (~1500 hisse + ETF)
 //   node scripts/build.mjs AAPL MSFT       # sadece bu semboller (test)
-//   LIMIT=25 node scripts/build.mjs        # ilk 25 sembol (hızlı deneme)
+//   LIMIT=25 node scripts/build.mjs        # evrenin ilk 25 sembolü
+//   RANK=1 node scripts/build.mjs          # universe-1500.json'ı yeniden sırala
 //
 // Çıkış kodu 1 → hiçbir sembol işlenemedi; workflow commit atmaz.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { gzipSync } from 'node:zlib';
 
-import { cachedFetch } from '../lib/http.mjs';
 import { loadTickerMap, loadFinancials, fetchQuote, fetchNportHoldings } from '../lib/edgar.mjs';
 import { businessScreen, financialRatios, screenEquity } from '../lib/screen.mjs';
+import { loadUniverse } from '../lib/universe.mjs';
+import { assessFundHoldings } from '../lib/fund-health.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..');
 const CACHE_ROOT = join(REPO_ROOT, 'cache'); // ham SEC yanıtları — .gitignore'da
 const SLIM_ROOT = join(REPO_ROOT, 'cache-slim'); // çıkarılmış özet — repoya commit'lenir
-const OUT_FILE = join(REPO_ROOT, 'stocks.json');
+const OUT_FILE = join(REPO_ROOT, 'stocks.json'); // insan-okunur (git diff)
+const MIN_FILE = join(REPO_ROOT, 'stocks.min.json'); // uygulamanın indirdiği
+const GZ_FILE = join(REPO_ROOT, 'stocks.min.json.gz'); // önceden sıkıştırılmış
 const WHITELIST_FILE = join(REPO_ROOT, 'etf-whitelist.json');
+const HEALTH_FILE = join(REPO_ROOT, 'fund-health-report.json');
 
-const SP500_CSV =
-  'https://raw.githubusercontent.com/datasets/s-and-p-500-companies/main/data/constituents.csv';
-
-const SECTOR_TR = {
-  'Information Technology': 'Teknoloji',
-  'Health Care': 'Sağlık',
-  Financials: 'Finans',
-  'Consumer Discretionary': 'Tüketici (döngüsel)',
-  'Consumer Staples': 'Tüketici (savunmacı)',
-  'Communication Services': 'İletişim',
-  Industrials: 'Sanayi',
-  Energy: 'Enerji',
-  Materials: 'Temel malzeme',
-  'Real Estate': 'Gayrimenkul',
-  Utilities: 'Kamu hizmetleri',
-};
-
-/** S&P 500 CSV → [{symbol, name, sector, cik}] (7 gün cache). */
-async function loadUniverse() {
-  const { data: csv } = await cachedFetch(CACHE_ROOT, 'sp500_constituents', SP500_CSV, {
-    maxAgeDays: 7,
-    accept: 'text/csv',
-    as: 'text',
-  });
-  const lines = csv.trim().split(/\r?\n/);
-  lines.shift(); // başlık
-  const rows = [];
-  for (const line of lines) {
-    // CSV: bazı alanlar tırnaklı ve virgül içerir.
-    const cells = parseCsvLine(line);
-    if (cells.length < 7) continue;
-    const [symbol, name, sector, , , , cik] = cells;
-    rows.push({
-      symbol: symbol.trim().toUpperCase(),
-      name: name.trim(),
-      sector: SECTOR_TR[sector.trim()] || sector.trim() || '—',
-      cik: cik ? cik.trim().padStart(10, '0') : null,
-    });
-  }
-  return rows;
-}
-
-function parseCsvLine(line) {
-  const out = [];
-  let cur = '';
-  let inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      if (inQ && line[i + 1] === '"') {
-        cur += '"';
-        i++;
-      } else inQ = !inQ;
-    } else if (ch === ',' && !inQ) {
-      out.push(cur);
-      cur = '';
-    } else cur += ch;
-  }
-  out.push(cur);
-  return out;
-}
+// Evren (~1500 hisse) `lib/universe.mjs` tarafından kurulur ve
+// `universe-1500.json`'da tutulur; sektör Türkçeleştirme ve CSV ayrıştırma da
+// oraya taşındı.
 
 /** Bir hisseyi işler → stocks.json kaydı (veya hata durumunda null). */
 async function processEquity(u, tickerMap, prev) {
@@ -175,8 +126,10 @@ async function processEquity(u, tickerMap, prev) {
   };
 }
 
-/** Beyaz listedeki bir ETF → stocks.json kaydı. */
-async function processEtf(symbol, meta, prev) {
+/** Beyaz listedeki bir ETF → stocks.json kaydı.
+ *  @param {Map<string, object>} stockBySymbol  bu turda taranan hisseler —
+ *    otomatik portföy sağlık denetimi için (lib/fund-health.mjs). */
+async function processEtf(symbol, meta, prev, stockBySymbol) {
   const old = prev.get(symbol) ?? {};
   const quote = (await fetchQuote(CACHE_ROOT, symbol)) ?? {
     price: Number(old.price ?? 0),
@@ -222,6 +175,28 @@ async function processEtf(symbol, meta, prev) {
   const hasFund = Object.keys(fund).length > 0 &&
     (fund.topHoldings?.length || fund.aumUsd != null || fund.expenseRatioPct != null || fund.inceptionDate != null);
 
+  // --- Otomatik portföy sağlık denetimi ---
+  // Kurul onayı fonu 'helal' yapar; bu denetim yalnızca AŞAĞI çekebilir.
+  // Bazı fonlar (ör. GYO fonları) muaftır: sektöre özel AAOIFI eşikleri Mizan
+  // hisse taramasından farklı olduğu için denetim yanlış pozitif üretir.
+  const health = meta.skipHealthCheck
+    ? { assessed: false, matchedWeightPct: 0, nonHalalWeightPct: 0, doubtfulWeightPct: 0, offenders: [], verdict: 'clean', note: null, skipped: true }
+    : assessFundHoldings(fund.topHoldings ?? [], stockBySymbol);
+
+  let status = 'halal';
+  let whyNote = `${meta.board} tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır.`;
+  let mizanScore = meta.score ?? 85;
+
+  if (health.verdict === 'breach') {
+    status = 'doubtful';
+    mizanScore = Math.min(mizanScore, 55);
+    whyNote =
+      `${meta.board} onaylı; ancak ${health.note} ` +
+      `(değerleme: ${fund.asOf ?? 'bilinmiyor'}).`;
+  } else if (health.verdict === 'watch' && health.note) {
+    whyNote += ` İzleme notu: ${health.note}`;
+  }
+
   return {
     symbol,
     name: meta.name,
@@ -234,13 +209,22 @@ async function processEtf(symbol, meta, prev) {
       : Number(old.marketCapBillions ?? 0),
     dividendYield: Number(old.dividendYield ?? 0),
     debtRatio: 0,
-    status: 'halal',
-    mizanScore: meta.score ?? 85,
-    whyNote: `${meta.board} tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır.`,
+    status,
+    mizanScore,
+    whyNote,
     screening: {
-      standard: 'Şeriat kurulu onayı (beyaz liste)',
-      source: 'etf-whitelist.json',
+      standard: 'Şeriat kurulu onayı (beyaz liste) + Mizan portföy sağlık denetimi',
+      source: 'etf-whitelist.json + SEC Form N-PORT',
       board: meta.board,
+      health: {
+        assessed: health.assessed,
+        matchedWeightPct: health.matchedWeightPct,
+        nonHalalWeightPct: health.nonHalalWeightPct,
+        doubtfulWeightPct: health.doubtfulWeightPct,
+        verdict: health.verdict,
+        offenders: health.offenders.slice(0, 8),
+        ...(health.skipped ? { skipped: true, skipReason: meta.skipHealthCheck } : {}),
+      },
     },
     ...(hasFund ? { fund } : {}),
   };
@@ -263,13 +247,22 @@ async function main() {
   const argSymbols = process.argv.slice(2).map((s) => s.toUpperCase());
   const limit = process.env.LIMIT ? Number(process.env.LIMIT) : null;
 
-  const [tickerMap, universeAll, whitelistRaw, prev] = await Promise.all([
+  const [tickerMap, whitelistRaw, prev] = await Promise.all([
     loadTickerMap(CACHE_ROOT),
-    loadUniverse(),
     readFile(WHITELIST_FILE, 'utf8'),
     readPrevious(),
   ]);
   const whitelist = JSON.parse(whitelistRaw).etfs;
+
+  // Evren (~1500): universe-1500.json taze ise ondan; değilse SEC ticker
+  // haritası piyasa değerine göre yeniden sıralanır (RANK=1 ile zorlanabilir).
+  const universeAll = await loadUniverse({
+    cacheRoot: CACHE_ROOT,
+    slimRoot: SLIM_ROOT,
+    repoRoot: REPO_ROOT,
+    tickerMap,
+    forceRank: process.env.RANK === '1',
+  });
 
   let universe = universeAll;
   if (argSymbols.length) {
@@ -307,20 +300,69 @@ async function main() {
     }
   }
 
+  // Taranan hisseleri sembolle indeksle — fon portföy sağlık denetimi için.
+  const stockBySymbol = new Map(out.map((s) => [String(s.symbol).toUpperCase(), s]));
+
   // ETF'ler (beyaz liste) — argSymbols verildiyse yalnızca istenenler.
   const etfSymbols = argSymbols.length
     ? Object.keys(whitelist).filter((s) => argSymbols.includes(s))
     : Object.keys(whitelist);
+  const healthReport = [];
   for (const symbol of etfSymbols) {
     try {
-      out.push(await processEtf(symbol, whitelist[symbol], prev));
+      const rec = await processEtf(symbol, whitelist[symbol], prev, stockBySymbol);
+      out.push(rec);
       ok++;
-      console.log(`  OK   ${symbol.padEnd(6)} -> ETF helal (beyaz liste)`);
+      const h = rec.screening?.health;
+      const tag =
+        rec.status === 'doubtful'
+          ? `ŞÜPHELİ — portföy denetimi (%${h?.nonHalalWeightPct} uygun değil)`
+          : h?.skipped
+            ? 'helal (denetim muaf — sektöre özel eşik)'
+            : h?.assessed
+              ? `helal (denetim OK, %${h.nonHalalWeightPct} uygun değil / %${h.matchedWeightPct} eşleşti)`
+              : 'helal (portföy denetlenemedi — ABD dışı/sukuk)';
+      console.log(`  OK   ${symbol.padEnd(6)} -> ETF ${tag}`);
+      if (h && !h.skipped && (h.verdict !== 'clean' || !h.assessed)) {
+        healthReport.push({
+          symbol,
+          name: whitelist[symbol].name,
+          status: rec.status,
+          verdict: h.verdict,
+          assessed: h.assessed,
+          nonHalalWeightPct: h.nonHalalWeightPct,
+          doubtfulWeightPct: h.doubtfulWeightPct,
+          matchedWeightPct: h.matchedWeightPct,
+          offenders: h.offenders,
+          asOf: rec.fund?.asOf ?? null,
+        });
+      }
     } catch (err) {
       failed++;
       console.warn(`  FAIL ${symbol.padEnd(6)} -> ${err.message}`);
     }
   }
+
+  // Fon sağlık raporu: hangi fon neden izlemede/bozuk — her hafta buradan
+  // bakılıp bozulan fon elle beyaz listeden çıkarılır, yerine yenisi eklenir.
+  await writeFile(
+    HEALTH_FILE,
+    JSON.stringify(
+      {
+        generatedAt: new Date().toISOString(),
+        note:
+          'Otomatik ETF portföy sağlık denetimi (lib/fund-health.mjs). "breach" = ' +
+          'fon otomatik ŞÜPHELİ\'ye düştü, beyaz listeden çıkarılıp yerine başka fon ' +
+          'eklenmeli. "watch" = kurul onayı geçerli ama izlemede. "assessed:false" = ' +
+          'portföy ABD dışı/sukuk olduğu için denetlenemedi (kurul onayına güvenilir).',
+        limits: { nonHalalWeightLimitPct: 5.0, unverifiedWeightLimitPct: 40.0 },
+        funds: healthReport,
+      },
+      null,
+      2,
+    ) + '\n',
+    'utf8',
+  );
 
   if (ok === 0) {
     console.error('\nHiçbir sembol işlenemedi; stocks.json değiştirilmedi.');
@@ -345,16 +387,35 @@ async function main() {
     standard: 'AAOIFI Şeriat Standardı No. 21 (borç/piyasa değeri < %30, faiz geliri < %5)',
     note:
       'Otomatik üretildi (scripts/build.mjs). Üçüncü bir tarama servisi kullanılmaz; ' +
-      'ham SEC verisi Mizan algoritmasıyla işlenir. ETF\'ler bağımsız Şeriat kurulu ' +
-      'onayına göre beyaz listeden gelir. Fiyatlar Yahoo chart endpoint\'inden, günde bir güncellenir.',
+      'ham SEC verisi Mizan algoritmasıyla işlenir. Evren ~1500 en büyük ABD hissesi ' +
+      '(S&P 500 çekirdek + SEC company_tickers piyasa değeri sıralaması, universe-1500.json). ' +
+      'ETF\'ler bağımsız Şeriat kurulu onaylı beyaz listeden gelir ve her hafta N-PORT ' +
+      'portföy sağlık denetiminden geçer (fund-health-report.json). Fiyatlar Yahoo chart ' +
+      'endpoint\'inden, günde bir güncellenir.',
     counts,
     stocks: out,
   };
 
-  await writeFile(OUT_FILE, JSON.stringify(payload, null, 2) + '\n', 'utf8');
+  // İnsan-okunur sürüm (git diff'i anlamlı kalsın diye 2 boşluk girintili).
+  const pretty = JSON.stringify(payload, null, 2) + '\n';
+  await writeFile(OUT_FILE, pretty, 'utf8');
+
+  // Uygulamanın indirdiği sürüm: boşluksuz (minify). ~1500 kayıtta pretty ~3 MB,
+  // minify ~2.2 MB. GitHub raw'ın kendi gzip'i bunu tel üstünde ~450 KB'ye
+  // indirir; ayrıca .gz'yi de yazıyoruz ki isteyen doğrudan çekebilsin.
+  const minified = JSON.stringify(payload);
+  await writeFile(MIN_FILE, minified, 'utf8');
+  const gz = gzipSync(Buffer.from(minified, 'utf8'), { level: 9 });
+  await writeFile(GZ_FILE, gz);
+
+  const kb = (n) => (n / 1024).toFixed(0);
   console.log(
     `\nstocks.json yazıldı: ${ok} başarılı, ${failed} başarısız. ` +
       `${counts.halal} helal / ${counts.doubtful} şüpheli / ${counts.nonHalal} uygun değil.`,
+  );
+  console.log(
+    `  boyut: pretty ${kb(Buffer.byteLength(pretty))} KB · ` +
+      `min ${kb(Buffer.byteLength(minified))} KB · gz ${kb(gz.length)} KB`,
   );
 }
 

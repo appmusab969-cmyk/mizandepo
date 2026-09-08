@@ -1,0 +1,94 @@
+{
+  "generatedAt": "2026-09-08T17:32:16.902Z",
+  "note": "Otomatik ETF portföy sağlık denetimi (lib/fund-health.mjs). \"breach\" = fon otomatik ŞÜPHELİ'ye düştü, beyaz listeden çıkarılıp yerine başka fon eklenmeli. \"watch\" = kurul onayı geçerli ama izlemede. \"assessed:false\" = portföy ABD dışı/sukuk olduğu için denetlenemedi (kurul onayına güvenilir).",
+  "limits": {
+    "nonHalalWeightLimitPct": 5,
+    "unverifiedWeightLimitPct": 40
+  },
+  "funds": [
+    {
+      "symbol": "SPSK",
+      "name": "SP Funds Dow Jones Global Sukuk ETF",
+      "status": "halal",
+      "verdict": "clean",
+      "assessed": false,
+      "nonHalalWeightPct": 0,
+      "doubtfulWeightPct": 0,
+      "matchedWeightPct": 0,
+      "offenders": [],
+      "asOf": "2026-05-31"
+    },
+    {
+      "symbol": "SPWO",
+      "name": "SP Funds S&P World (ex-US) ETF",
+      "status": "halal",
+      "verdict": "clean",
+      "assessed": false,
+      "nonHalalWeightPct": 0,
+      "doubtfulWeightPct": 0,
+      "matchedWeightPct": 0,
+      "offenders": [],
+      "asOf": "2026-01-31"
+    },
+    {
+      "symbol": "SPEM",
+      "name": "SP Funds S&P Emerging Markets Sharia ETF",
+      "status": "halal",
+      "verdict": "clean",
+      "assessed": false,
+      "nonHalalWeightPct": 0,
+      "doubtfulWeightPct": 0,
+      "matchedWeightPct": 0,
+      "offenders": [],
+      "asOf": null
+    },
+    {
+      "symbol": "SPSC",
+      "name": "SP Funds S&P Small Cap Sharia ETF",
+      "status": "halal",
+      "verdict": "clean",
+      "assessed": false,
+      "nonHalalWeightPct": 0,
+      "doubtfulWeightPct": 0,
+      "matchedWeightPct": 0,
+      "offenders": [],
+      "asOf": null
+    },
+    {
+      "symbol": "UMMA",
+      "name": "Wahed Dow Jones Islamic World ETF",
+      "status": "halal",
+      "verdict": "clean",
+      "assessed": false,
+      "nonHalalWeightPct": 0,
+      "doubtfulWeightPct": 0,
+      "matchedWeightPct": 2.5,
+      "offenders": [],
+      "asOf": "2026-05-31"
+    },
+    {
+      "symbol": "WSHR",
+      "name": "Wealthsimple Shariah World Equity Index ETF",
+      "status": "halal",
+      "verdict": "clean",
+      "assessed": false,
+      "nonHalalWeightPct": 0,
+      "doubtfulWeightPct": 0,
+      "matchedWeightPct": 0,
+      "offenders": [],
+      "asOf": null
+    },
+    {
+      "symbol": "WISEX",
+      "name": "Azzad Wise Capital Fund",
+      "status": "halal",
+      "verdict": "clean",
+      "assessed": false,
+      "nonHalalWeightPct": 0,
+      "doubtfulWeightPct": 0,
+      "matchedWeightPct": 0.5,
+      "offenders": [],
+      "asOf": "2026-06-30"
+    }
+  ]
+}

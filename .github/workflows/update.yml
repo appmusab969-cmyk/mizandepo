@@ -1,21 +1,35 @@
 name: stocks.json guncelle (SEC EDGAR)
 
 # Veri kaynagi SEC EDGAR (ucretsiz, anahtarsiz). Fair-access siniri saniyede
-# 10 istek; script ~1 istek/sn gider.
+# 10 istek; script ~2.5 istek/sn gider (MIN_GAP_MS=400).
 #
-# İki katmanli cache:
-#   - cache/       : ham SEC companyfacts yanitlari (~2GB). .gitignore'da,
+# Evren: ~1500 en buyuk ABD hissesi. universe-1500.json taze ise (90 gunden
+# yeni) o sabit liste taranir; degilse SEC company_tickers.json piyasa degerine
+# gore yeniden siralanir (pahali, ~1 saat) ve universe-1500.json commit'lenir.
+#
+# Iki katmanli cache:
+#   - cache/       : ham SEC companyfacts yanitlari (~2GB+). .gitignore'da,
 #                    sadece yerel hiz icin. Actions'ta her calismada bostur.
-#   - cache-slim/  : cikarilmis ozet (~0.7MB, repoya commit'lenir). 20 gunden
+#   - cache-slim/  : cikarilmis ozet (~2MB, repoya commit'lenir). 20 gunden
 #                    yeni kayitlar icin EDGAR'a HIC gidilmez.
 #
-# Yani ilk hafta ~500 sirket icin tam EDGAR taramasi (~20-25 dk) yapilir ve
-# cache-slim/ commit'lenir; sonraki haftalar cogunlukla slim'den okur, sadece
-# fiyat (Yahoo) ve bayat kayitlar yenilenir (~5-10 dk).
+# Ilk hafta (slim bos): ~1500 sirket tam EDGAR taramasi ~60-90 dk. Sonraki
+# haftalar cogunlukla slim'den okur, sadece fiyat (Yahoo) + bayat kayitlar
+# yenilenir (~15-25 dk).
+#
+# ETF'ler: bagimsiz Seriat kurulu onayli beyaz liste (etf-whitelist.json), her
+# hafta N-PORT portfoy saglik denetiminden gecer. Bozulan fonlar
+# fund-health-report.json'a yazilir (verdict: "breach") -> elle listeden
+# cikarilip yerine yeni fon eklenir.
 on:
   schedule:
     - cron: '0 6 * * 1' # her pazartesi 06:00 UTC
-  workflow_dispatch: {} # elle tetikleme
+  workflow_dispatch:
+    inputs:
+      rank:
+        description: 'universe-1500.json yeniden siralansin (RANK=1) — pahali'
+        required: false
+        default: 'false'
 
 permissions:
   contents: write
@@ -27,7 +41,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 330 # yeniden siralama + soguk 1500 taramasi icin genis pay
     steps:
       - uses: actions/checkout@v4
 
@@ -36,11 +50,13 @@ jobs:
           node-version: 20
 
       - name: Veriyi cek ve stocks.json uret
+        env:
+          RANK: ${{ github.event.inputs.rank == 'true' && '1' || '' }}
         run: node scripts/build.mjs
 
       - name: Degisiklik varsa commit'le
         run: |
-          git add stocks.json cache-slim/
+          git add stocks.json stocks.min.json stocks.min.json.gz cache-slim/ universe-1500.json fund-health-report.json
           if git diff --cached --quiet; then
             echo "Degisiklik yok; commit atlanacak."
             exit 0
