@@ -122,6 +122,24 @@ async function processEquity(u, tickerMap, prev) {
       sicDescription: sub.sicDescription,
       dataComplete,
       staleSource: factsRes.stale,
+      // AAOIFI arındırma — hisse başına helal olmayan gelir (USD/yıl).
+      // impurePerShareUsd null ise uygulama hesap yapmaz, kullanıcıyı 10-K'ya
+      // / âlime yönlendirir. `basis` kullanıcıya hangi mali dönemin esas
+      // alındığını gösterir.
+      purification:
+        verdict.ratios.impurePerShareUsd != null
+          ? {
+              method: 'AAOIFI',
+              impurePerShareUsd: verdict.ratios.impurePerShareUsd,
+              currency: 'USD',
+              basisPeriodEnd: fin.asOf ?? null,
+              note:
+                'Yıllık toplam faiz gelirinin dolaşan hisse adedine bölümü. ' +
+                'Arındırılacak tutar = bu değer × sahip olunan adet × ' +
+                '(tutulan gün / 365).',
+              stale: factsRes.stale,
+            }
+          : { method: 'AAOIFI', impurePerShareUsd: null, reason: 'no-data' },
     },
   };
 }

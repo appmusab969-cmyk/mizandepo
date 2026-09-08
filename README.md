@@ -56,6 +56,25 @@ en fazla **şüpheli**.
 > **Dini uygulama ilkesi:** Emin olmadığımız hiçbir şeye "helal" demeyiz.
 > Veri eksik, oran sınırda ya da kaynak bayatsa sonuç **şüpheli**dir.
 
+## Arındırma (temizleme)
+
+Uygulamadaki arındırma hesaplayıcısı **AAOIFI "hisse başına" yöntemini**
+kullanır — en katı ve en yaygın kabul gören yöntem:
+
+    arındırılacak = (yıllık faiz geliri ÷ dolaşan hisse adedi)
+                    × sahip olunan adet × (tutulan gün ÷ 365)
+
+Temettü dağıtılmasa bile geçerlidir; `halal` bir hissede bile <%5 faiz geliri
+arındırma gerektirebilir. `nonHalal` hisselere ve fonlara uygulanmaz.
+
+`lib/screen.mjs` `impurePerShareUsd = interestIncome / sharesOutstanding`
+hesaplar (yalnızca ikisi de varsa); `build.mjs` bunu `screening.purification`
+nesnesine yazar. **Veri yoksa** (`impurePerShareUsd: null` — ör. AAPL/MSFT gibi
+faiz gelirini "Other income" içinde birleştiren şirketler) uygulama **hiçbir
+rakam göstermez**, kullanıcıyı 10-K raporuna / bir âlime yönlendirir. Yanlış
+rakam kullanıcıyı maddi ve dini kayba uğratır. ~1500 hissenin ~%55'inde veri
+var.
+
 ## Hisse evreni — "en popüler ~1500 ABD hissesi"
 
 `lib/universe.mjs` evreni kurar ve `universe-1500.json`'da tutar:
