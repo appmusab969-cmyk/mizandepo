@@ -102,6 +102,15 @@ gözden kaçırır). Her hafta build sırasında:
   geçerli ama izlemede).
 - Portföyün eşleşen kısmı < %15 ise (ABD dışı / sukuk, ticker yok) denetim
   yapılamaz (`assessed: false`) → kurul onayına güvenilir.
+- Bir fonun whitelist kaydında **`skipHealthCheck`** alanı varsa denetim
+  tamamen atlanır (`skipped: true`) ve hüküm yalnızca kurul onayına dayanır.
+  Bu, **GYO fonu** (SPRE) gibi Mizan'ın hisse taramasının sektöre özel AAOIFI
+  metodolojisiyle çeliştiği belgelenmiş durumlar içindir: GYO'ların sermaye
+  yapısı gereği faizli borcu yüksektir, Mizan onları `borç / piyasa değeri <
+  %30` ile ölçer ve tek tek "uygun değil" gösterir; oysa S&P Şeriat kurulu
+  GYO'ları farklı tabanla (borç/toplam varlık, kira geliri ağırlığı) tarar.
+  `skipHealthCheck` metni bu nedeni ve kullanıcının fondaki bir GYO'ya tek tek
+  bakınca farklı sonuç görebileceğini açıklar; bu metin `whyNote`'a da eklenir.
 
 Denetim yalnızca **aşağı** çeker; kurul onayı olmayan bir fonu asla "helal"
 yapmaz.

@@ -31576,7 +31576,7 @@
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 92,
-      "whyNote": "S&P Dow Jones Shariah Supervisory Board + Ratings Intelligence (AAOIFI metodolojisi) tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır.",
+      "whyNote": "S&P Dow Jones Shariah Supervisory Board + Ratings Intelligence (AAOIFI metodolojisi) tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır. Mizan portföy denetimi (2026-02-28): eşleşen pozisyonların %0'i \"uygun değil\" — %5 eşiğinin altında.",
       "screening": {
         "standard": "Şeriat kurulu onayı (beyaz liste) + Mizan portföy sağlık denetimi",
         "source": "etf-whitelist.json + SEC Form N-PORT",
@@ -35971,7 +35971,7 @@
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 89,
-      "whyNote": "Wahed Şeriat Danışma Kurulu (Yasaar Limited) — FTSE Shariah endeksi tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır.",
+      "whyNote": "Wahed Şeriat Danışma Kurulu (Yasaar Limited) — FTSE Shariah endeksi tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır. Mizan portföy denetimi (2026-05-31): eşleşen pozisyonların %0'i \"uygun değil\" — %5 eşiğinin altında.",
       "screening": {
         "standard": "Şeriat kurulu onayı (beyaz liste) + Mizan portföy sağlık denetimi",
         "source": "etf-whitelist.json + SEC Form N-PORT",
@@ -38181,7 +38181,7 @@
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 85,
-      "whyNote": "S&P Dow Jones Shariah Supervisory Board + Ratings Intelligence tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır.",
+      "whyNote": "S&P Dow Jones Shariah Supervisory Board + Ratings Intelligence tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır. Mizan portföy denetimi (2026-01-31): eşleşen pozisyonların %0'i \"uygun değil\" — %5 eşiğinin altında.",
       "screening": {
         "standard": "Şeriat kurulu onayı (beyaz liste) + Mizan portföy sağlık denetimi",
         "source": "etf-whitelist.json + SEC Form N-PORT",
@@ -38368,7 +38368,7 @@
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 84,
-      "whyNote": "Bağımsız Şeriat Denetim Kurulu + Russell IdealRatings AAOIFI taraması; yayımlanmış uygunluk sertifikası tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır.",
+      "whyNote": "Bağımsız Şeriat Denetim Kurulu + Russell IdealRatings AAOIFI taraması; yayımlanmış uygunluk sertifikası tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır. Mizan portföy denetimi (2026-04-30): eşleşen pozisyonların %0'i \"uygun değil\" — %5 eşiğinin altında.",
       "screening": {
         "standard": "Şeriat kurulu onayı (beyaz liste) + Mizan portföy sağlık denetimi",
         "source": "etf-whitelist.json + SEC Form N-PORT",
@@ -38548,7 +38548,7 @@
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 80,
-      "whyNote": "Azzad Etik Yatırım Kurulu — bağımsız Şeriat danışmanları; ABD orta ölçekli hisse tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır.",
+      "whyNote": "Azzad Etik Yatırım Kurulu — bağımsız Şeriat danışmanları; ABD orta ölçekli hisse tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır. Mizan portföy denetimi (2026-06-30): eşleşen pozisyonların %0'i \"uygun değil\" — %5 eşiğinin altında.",
       "screening": {
         "standard": "Şeriat kurulu onayı (beyaz liste) + Mizan portföy sağlık denetimi",
         "source": "etf-whitelist.json + SEC Form N-PORT",
@@ -38645,7 +38645,7 @@
       "debtRatio": 0,
       "status": "halal",
       "mizanScore": 80,
-      "whyNote": "S&P Dow Jones Shariah Supervisory Board + Ratings Intelligence — taranmış GYO sepeti tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır.",
+      "whyNote": "S&P Dow Jones Shariah Supervisory Board + Ratings Intelligence — taranmış GYO sepeti tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır. Bu fon için Mizan'ın otomatik portföy denetimi uygulanmaz: GYO fonu. GYO'ların sermaye yapısı gereği faizli borcu yüksektir; Mizan'ın hisse taraması bunları sıradan şirket gibi 'faizli borç / piyasa değeri < %30' kuralıyla ölçtüğü için portföydeki birçok GYO tek başına 'uygun değil' çıkar. Oysa AAOIFI ve S&P Shariah kurulu GYO'ları farklı değerlendirir (borç/toplam varlık tabanı, kira gelirinin ağırlığı, faiz gelirinin arındırılması). Bu fonun portföyünü S&P Dow Jones Şeriat Denetim Kurulu bu GYO metodolojisiyle taradığı için otomatik portföy denetimini uygulamıyoruz; hüküm kurul onayına dayanır. NOT: kullanıcı fondaki bir GYO'ya tek tek bakarsa Mizan hisse taraması yine 'uygun değil' gösterebilir — bu, o hisseyi tek başına almakla kurul-taranmış bir GYO sepetine ortak olmak arasındaki farktır.",
       "screening": {
         "standard": "Şeriat kurulu onayı (beyaz liste) + Mizan portföy sağlık denetimi",
         "source": "etf-whitelist.json + SEC Form N-PORT",
@@ -38658,7 +38658,7 @@
           "verdict": "clean",
           "offenders": [],
           "skipped": true,
-          "skipReason": "GYO fonu — AAOIFI GYO'lara özel borç/varlık eşikleri uygular; Mizan hisse taraması GYO'ları sıradan şirket gibi %30 borç/piyasa değeri eşiğiyle tarar, bu yüzden portföy denetimi yanlış pozitif üretir. Kurul onayına güvenilir."
+          "skipReason": "GYO fonu. GYO'ların sermaye yapısı gereği faizli borcu yüksektir; Mizan'ın hisse taraması bunları sıradan şirket gibi 'faizli borç / piyasa değeri < %30' kuralıyla ölçtüğü için portföydeki birçok GYO tek başına 'uygun değil' çıkar. Oysa AAOIFI ve S&P Shariah kurulu GYO'ları farklı değerlendirir (borç/toplam varlık tabanı, kira gelirinin ağırlığı, faiz gelirinin arındırılması). Bu fonun portföyünü S&P Dow Jones Şeriat Denetim Kurulu bu GYO metodolojisiyle taradığı için otomatik portföy denetimini uygulamıyoruz; hüküm kurul onayına dayanır. NOT: kullanıcı fondaki bir GYO'ya tek tek bakarsa Mizan hisse taraması yine 'uygun değil' gösterebilir — bu, o hisseyi tek başına almakla kurul-taranmış bir GYO sepetine ortak olmak arasındaki farktır."
         }
       },
       "fund": {
@@ -38732,7 +38732,7 @@
       "assetType": "ETF",
       "price": 78.15,
       "changePercent": -5.84,
-      "marketCapBillions": 0,
+      "marketCapBillions": 3,
       "dividendYield": 0,
       "debtRatio": 0,
       "status": "halal",

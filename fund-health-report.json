@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T17:32:16.902Z",
+  "generatedAt": "2026-09-08T17:49:33.920Z",
   "note": "Otomatik ETF portföy sağlık denetimi (lib/fund-health.mjs). \"breach\" = fon otomatik ŞÜPHELİ'ye düştü, beyaz listeden çıkarılıp yerine başka fon eklenmeli. \"watch\" = kurul onayı geçerli ama izlemede. \"assessed:false\" = portföy ABD dışı/sukuk olduğu için denetlenemedi (kurul onayına güvenilir).",
   "limits": {
     "nonHalalWeightLimitPct": 5,

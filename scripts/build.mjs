@@ -187,7 +187,10 @@ async function processEtf(symbol, meta, prev, stockBySymbol) {
   let whyNote = `${meta.board} tarafından Şeriat'a uygun onaylandı. Portföyün tamamı bağımsız kurul tarafından taranır.`;
   let mizanScore = meta.score ?? 85;
 
-  if (health.verdict === 'breach') {
+  if (health.skipped) {
+    // Muaf fon: kurul onayına dayanır, otomatik portföy denetimi uygulanmaz.
+    whyNote += ` Bu fon için Mizan'ın otomatik portföy denetimi uygulanmaz: ${meta.skipHealthCheck}`;
+  } else if (health.verdict === 'breach') {
     status = 'doubtful';
     mizanScore = Math.min(mizanScore, 55);
     whyNote =
@@ -195,6 +198,10 @@ async function processEtf(symbol, meta, prev, stockBySymbol) {
       `(değerleme: ${fund.asOf ?? 'bilinmiyor'}).`;
   } else if (health.verdict === 'watch' && health.note) {
     whyNote += ` İzleme notu: ${health.note}`;
+  } else if (health.assessed) {
+    whyNote +=
+      ` Mizan portföy denetimi (${fund.asOf ?? 'son N-PORT'}): eşleşen ` +
+      `pozisyonların %${health.nonHalalWeightPct}'i "uygun değil" — %5 eşiğinin altında.`;
   }
 
   return {
