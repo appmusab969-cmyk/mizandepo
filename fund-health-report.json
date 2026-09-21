@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-14T06:23:05.050Z",
+  "generatedAt": "2026-09-21T06:22:53.364Z",
   "note": "Otomatik ETF portföy sağlık denetimi (lib/fund-health.mjs). \"breach\" = fon otomatik ŞÜPHELİ'ye düştü, beyaz listeden çıkarılıp yerine başka fon eklenmeli. \"watch\" = kurul onayı geçerli ama izlemede. \"assessed:false\" = portföy ABD dışı/sukuk olduğu için denetlenemedi (kurul onayına güvenilir).",
   "limits": {
     "nonHalalWeightLimitPct": 5,
@@ -28,7 +28,7 @@
       "doubtfulWeightPct": 0,
       "matchedWeightPct": 0,
       "offenders": [],
-      "asOf": "2026-01-31"
+      "asOf": "2026-07-31"
     },
     {
       "symbol": "SPEM",
@@ -61,7 +61,7 @@
       "verdict": "clean",
       "assessed": false,
       "nonHalalWeightPct": 0,
-      "doubtfulWeightPct": 0,
+      "doubtfulWeightPct": 2.5,
       "matchedWeightPct": 2.5,
       "offenders": [],
       "asOf": "2026-05-31"
