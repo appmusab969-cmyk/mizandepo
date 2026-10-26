@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-19T12:17:17.151Z",
+  "generatedAt": "2026-10-26T12:36:17.992Z",
   "note": "Otomatik ETF portföy sağlık denetimi (lib/fund-health.mjs). \"breach\" = fon otomatik ŞÜPHELİ'ye düştü, beyaz listeden çıkarılıp yerine başka fon eklenmeli. \"watch\" = kurul onayı geçerli ama izlemede. \"assessed:false\" = portföy ABD dışı/sukuk olduğu için denetlenemedi (kurul onayına güvenilir).",
   "limits": {
     "nonHalalWeightLimitPct": 5,
@@ -62,9 +62,9 @@
       "assessed": false,
       "nonHalalWeightPct": 0,
       "doubtfulWeightPct": 0,
-      "matchedWeightPct": 2.5,
+      "matchedWeightPct": 3.1,
       "offenders": [],
-      "asOf": "2026-05-31"
+      "asOf": "2026-08-31"
     },
     {
       "symbol": "WSHR",
